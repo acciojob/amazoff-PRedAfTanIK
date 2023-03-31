@@ -18,6 +18,8 @@ public class OrderRepository {
         partnerDb.put(partner.getId(),partner);
     }
     public void addOrderToPartner(String orderId,String partnerId){
+        if(!partnerDb.containsKey(partnerId)) return;
+        if(!orderDb.containsKey(orderId)) return;
         ordersForPartner.putIfAbsent(partnerId,new HashSet<>());
         ordersForPartner.get(partnerId).add(orderId);
         orderBelongsToPartner.put(orderId,partnerId);
@@ -25,10 +27,10 @@ public class OrderRepository {
         partner.setNumberOfOrders(partner.getNumberOfOrders()+1);
     }
     public Order getOrder(String orderId){
-        return orderDb.get(orderId);
+        return orderDb.getOrDefault(orderId,new Order());
     }
     public DeliveryPartner getPartner(String partnerId){
-        return partnerDb.get(partnerId);
+        return partnerDb.getOrDefault(partnerId,new DeliveryPartner());
     }
     public int getOrderCountForPartner(String partnerId){
         return ordersForPartner.getOrDefault(partnerId,new HashSet<>()).size();
@@ -36,17 +38,11 @@ public class OrderRepository {
     public List<String> getOrderListForPartner(String partnerId){
         List<String> list = new ArrayList<>();
         if(!ordersForPartner.containsKey(partnerId)) return list;
-
-        for(String order:ordersForPartner.get(partnerId))
-            list.add(order);
-
+        list.addAll(ordersForPartner.get(partnerId));
         return list;
     }
     public List<String> getAllOrders(){
-        List<String> list = new ArrayList<>();
-        for(String order:orderDb.keySet())
-            list.add(order);
-        return list;
+        return new ArrayList<>(orderDb.keySet());
     }
     public int getUnassignedOrders(){
         int count = 0;
@@ -57,6 +53,7 @@ public class OrderRepository {
         return count;
     }
     public int getUndeliveredOrdersByPartner(String partnerId,int givenTime){
+        if(!partnerDb.containsKey(partnerId)) return 0;
         int count = 0;
         for(String orderId:ordersForPartner.get(partnerId)){
             if(orderDb.get(orderId).getDeliveryTime()<givenTime)
@@ -65,6 +62,7 @@ public class OrderRepository {
         return count;
     }
     public int getLastDeliveryTimeForPartner(String partnerId){
+        if(!partnerDb.containsKey(partnerId)) return 0;
         int lastTime = 0;
         for(String orderId:ordersForPartner.get(partnerId)){
             int currentTime = orderDb.get(orderId).getDeliveryTime();
