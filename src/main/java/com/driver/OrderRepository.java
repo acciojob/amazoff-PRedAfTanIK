@@ -21,6 +21,8 @@ public class OrderRepository {
         ordersForPartner.putIfAbsent(partnerId,new HashSet<>());
         ordersForPartner.get(partnerId).add(orderId);
         orderBelongsToPartner.put(orderId,partnerId);
+        DeliveryPartner partner = partnerDb.get(partnerId);
+        partner.setNumberOfOrders(partner.getNumberOfOrders()+1);
     }
     public Order getOrder(String orderId){
         return orderDb.get(orderId);
@@ -86,6 +88,8 @@ public class OrderRepository {
         if(partnerId.length() == 0) return;
         orderBelongsToPartner.remove(orderId);
         ordersForPartner.get(partnerId).remove(orderId);
+        DeliveryPartner partner = partnerDb.get(partnerId);
+        partner.setNumberOfOrders(partner.getNumberOfOrders()-1);
     }
 
 }
