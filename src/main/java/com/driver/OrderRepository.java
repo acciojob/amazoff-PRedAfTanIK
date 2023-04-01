@@ -57,7 +57,7 @@ public class OrderRepository {
         if(!ordersForPartner.containsKey(partnerId)) return 0;
         int count = 0;
         for(String orderId:ordersForPartner.get(partnerId)){
-            if(orderDb.get(orderId).getDeliveryTime()<givenTime)
+            if(orderDb.get(orderId).getDeliveryTime()>givenTime)
                 count++;
         }
         return count;
