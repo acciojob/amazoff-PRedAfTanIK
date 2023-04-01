@@ -54,6 +54,7 @@ public class OrderRepository {
     }
     public int getUndeliveredOrdersByPartner(String partnerId,int givenTime){
         if(!partnerDb.containsKey(partnerId)) return 0;
+        if(!ordersForPartner.containsKey(partnerId)) return 0;
         int count = 0;
         for(String orderId:ordersForPartner.get(partnerId)){
             if(orderDb.get(orderId).getDeliveryTime()<givenTime)
